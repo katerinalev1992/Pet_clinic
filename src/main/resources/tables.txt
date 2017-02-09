@@ -1,0 +1,119 @@
+-- Table: public.owners
+
+-- DROP TABLE public.owners;
+
+CREATE TABLE public.owners
+(
+  name character varying,
+  pet bigint,
+  home_veterinarian bigint,
+  id bigint NOT NULL,
+  CONSTRAINT pk_owner PRIMARY KEY (id),
+  CONSTRAINT fk_owner_pet FOREIGN KEY (pet)
+      REFERENCES public.pets (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_owner_vet FOREIGN KEY (home_veterinarian)
+      REFERENCES public.veterinarian (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.owners
+  OWNER TO postgres;
+
+-- Index: public.fki_owner_pet
+
+-- DROP INDEX public.fki_owner_pet;
+
+CREATE INDEX fki_owner_pet
+  ON public.owners
+  USING btree
+  (pet);
+
+-- Index: public.fki_owner_vet
+
+-- DROP INDEX public.fki_owner_vet;
+
+CREATE INDEX fki_owner_vet
+  ON public.owners
+  USING btree
+  (home_veterinarian);
+
+
+-- Table: public.pets
+
+-- DROP TABLE public.pets;
+
+CREATE TABLE public.pets
+(
+  name character varying,
+  race character varying,
+  gender character varying,
+  age bigint,
+  owner bigint,
+  id bigint NOT NULL,
+  CONSTRAINT pk_pets PRIMARY KEY (id),
+  CONSTRAINT fk_pet_owner FOREIGN KEY (owner)
+      REFERENCES public.owners (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.pets
+  OWNER TO postgres;
+
+-- Index: public.fki_pet_owner
+
+-- DROP INDEX public.fki_pet_owner;
+
+CREATE INDEX fki_pet_owner
+  ON public.pets
+  USING btree
+  (owner);
+
+-- Table: public.veterinarian
+
+-- DROP TABLE public.veterinarian;
+
+CREATE TABLE public.veterinarian
+(
+  name character varying,
+  treated_pet bigint,
+  current_customer bigint,
+  id bigint NOT NULL,
+  CONSTRAINT pk_veterinarian PRIMARY KEY (id),
+  CONSTRAINT fk_current_customer FOREIGN KEY (current_customer)
+      REFERENCES public.owners (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT fk_treated_pet FOREIGN KEY (treated_pet)
+      REFERENCES public.pets (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.veterinarian
+  OWNER TO postgres;
+
+-- Index: public.fki_current_customer
+
+-- DROP INDEX public.fki_current_customer;
+
+CREATE INDEX fki_current_customer
+  ON public.veterinarian
+  USING btree
+  (current_customer);
+
+-- Index: public.fki_treated_pet
+
+-- DROP INDEX public.fki_treated_pet;
+
+CREATE INDEX fki_treated_pet
+  ON public.veterinarian
+  USING btree
+  (treated_pet);
+
+
+
